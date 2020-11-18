@@ -64,7 +64,7 @@ for (counter in c(1:14)) {  #data collection from paper
 Y_meas = EC_yield_mean_summary
 
 #get EC F14C raw data
-F_meas = F14C_raw_data
+F_meas = F14C_EC_raw_data
 
 #####
 

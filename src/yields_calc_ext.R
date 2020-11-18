@@ -212,7 +212,9 @@ if (average_type=="golay") {
 #-------------laser vs temperature --exponential fit of laser during cooling down from max temp (last fraction)---------------------
 request_diff<-temp_lag-request_lag
 
-L_start<-which.max(request_diff)  #algorithm difference between requested and real temperature
+# L_start<-which.max(request_diff)  #algorithm difference between requested and real temperature
+# MR v. 1.0.5 L_start defined as value with max temperature: max temp. will always be the last step
+L_start<-which.max(temp_lag)
 L_end<-length(x_lag)
 L1<-laser_smooth[L_start]
 L2<-laser_smooth[L_end]
@@ -292,12 +294,38 @@ if (fitting_type=="poly" || fitting_type=="manual") {
 }
 
 ATN<--100*log(laser_smooth/laser_corr)
-#plot.new()
-# plot(x_lag,laser_smooth, col="black", type="l",main="black: unc laser, red:corr laser, blue:ATN")   #black is uncorrected smoothed laser
-# points(x_lag,laser_corr,col="red", type="l")  #red is corrected smoothed laser
-# par(new=TRUE)
-# plot(x_lag,ATN,axes=FALSE,xlab="",ylab="",col="blue", type="l")  #blue is ATN of corrected smoothed laser
-# axis(side=4,at=pretty(range(ATN)))
+
+#plot_fit
+temp_laser_data = as.data.frame(cbind(temp_lag,laser_corr))
+theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
+plot_fit = ggplot(ds, aes(x=ms, y=ls)) +
+  geom_point(shape=20, color ="red")+
+  geom_line(temp_laser_data, mapping = aes(temp_lag,laser_corr),col="blue")+
+  xlab("Temperature (°C)")+
+  ylab("Laser signal (a.u.)")+
+  labs(title =  paste("K0=",as.integer(fitting_poly.coef[1])," K1=",signif(fitting_poly.coef[2],3)," K2=",signif(fitting_poly.coef[3],3), " r^2 =" ,signif(r.sqr,3)))
+plot_fit = plot_fit+ theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
+plot_fit
+
+#slope
+charr_corr_slope <- signif(fitting_poly.coef[2],3)
+
+#black is uncorrected smoothed laser, red is corrected smoothed laser, blue is ATN of corrected smoothed laser
+#data is normalised 
+
+laser_data <- as.data.frame(cbind(x_lag,laser_smooth, laser_corr, ATN))
+laser_data_normalised <- as.data.frame(cbind(x_lag,laser_smooth/max(laser_smooth)*100, laser_corr/max(laser_smooth)*100, ATN/max(ATN)*100))
+colnames(laser_data_normalised) <- c("x_lag","laser_smooth", "laser_corr", "ATN")
+theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
+plot_TwoSide <- ggplot(laser_data_normalised) +
+  geom_line(aes(x_lag,laser_smooth),color = "black")+
+  geom_line(aes(x_lag,laser_corr),color = "red")+
+  geom_line(aes(x_lag,ATN),color = "blue")+
+  xlab("Time (s)")+
+  ylab("Normalised (%)")+
+  labs(title = "black: unc laser, red: corr laser, blue: ATN" )
+plot_TwoSide <- plot_TwoSide + theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
+plot_TwoSide
 
 # par(mfrow=c(3,1))
 # plot(x_lag,ATN,type="l")
@@ -405,12 +433,34 @@ tabla_resultados2<-data.frame("EC_yield"=c(tabla_resultados[3,1]), "charringS1"=
 print(tabla_resultados2)
 
 ATN_rango<-max(ATN)-min(ATN); ATN_medio<-ATN_rango/2
-# plot(x_lag,temp_lag/max(temp_lag),ylim=c(0,1),type="l", main=paste("ATNmax=",signif(max(ATN),3)," ATNmin=",signif(min(ATN),3), " Lasermax=",signif(max(laser_smooth))))
-# grid(nx=40)
-# points(x_lag[data_search_jump],data_search_y1,type="h",col="red")
-# lines(x_lag,request_lag/max(temp_lag),col="green")
-# lines(x_lag,(ATN)/(max(ATN)),type="l",col="blue")
+###ggplot plot_Sunset
+plot_Sunset_data <- as.data.frame(cbind(x_lag,temp_lag/max(temp_lag),ATN))
+colnames(plot_Sunset_data) <- c("x_lag","temp_lag_norm", "ATN")
+theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
+plot_Sunset <- ggplot(plot_Sunset_data) +
+  geom_line(aes(x_lag,temp_lag_norm),color = "black")+
+  geom_line(aes(x_lag,request_lag/max(temp_lag)),color = "green")+
+  geom_line(aes(x_lag,(ATN)/(max(ATN))),color = "blue")+
+  geom_vline(xintercept=x_lag[data_search_jump], color = "red", linetype = "dashed")+
+  xlab("Time (s)")+
+  ylab("Normalised")+
+  labs(title = paste("ATNmax=",signif(max(ATN),3)," ATNmin=",signif(min(ATN),3), " Lasermax=",signif(max(laser_smooth))))
+plot_Sunset <- plot_Sunset + theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
+plot_Sunset
 
+laser_data <- as.data.frame(cbind(x_lag,laser_smooth, laser_corr, ATN))
+laser_data_normalised <- as.data.frame(cbind(x_lag,laser_smooth/max(laser_smooth)*100, laser_corr/max(laser_smooth)*100, ATN/max(ATN)*100))
+colnames(laser_data_normalised) <- c("x_lag","laser_smooth", "laser_corr", "ATN")
+theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
+plot_TwoSide <- ggplot(laser_data_normalised) +
+  geom_line(aes(x_lag,laser_smooth),color = "black")+
+  geom_line(aes(x_lag,laser_corr),color = "red")+
+  geom_line(aes(x_lag,ATN),color = "blue")+
+  xlab("Time (s)")+
+  ylab("Normalised (%)")+
+  labs(title = "black: unc laser, red: corr laser, blue: ATN" )
+plot_TwoSide <- plot_TwoSide + theme( plot.margin = margin(0.5, 0.5, 1, 0.5, "in"))
+plot_TwoSide
 if (error_message=="") {print("no errors")}
 print(error_message)
 
