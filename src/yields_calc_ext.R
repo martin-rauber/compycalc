@@ -295,6 +295,8 @@ if (fitting_type=="poly" || fitting_type=="manual") {
 
 ATN<--100*log(laser_smooth/laser_corr)
 
+#title for plot_fit
+plot_fit_title <- bquote(K[0] == .(as.integer(fitting_poly.coef[1])) ~ " " ~ K[1] == .(signif(fitting_poly.coef[2],3))~ " " ~ K[2] == .(signif(fitting_poly.coef[3],3))~ " " ~r^2 == .(signif(r.sqr,3)))
 #plot_fit
 temp_laser_data = as.data.frame(cbind(temp_lag,laser_corr))
 theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
@@ -303,8 +305,8 @@ plot_fit = ggplot(ds, aes(x=ms, y=ls)) +
   geom_line(temp_laser_data, mapping = aes(temp_lag,laser_corr),col="blue")+
   xlab("Temperature (°C)")+
   ylab("Laser signal (a.u.)")+
-  labs(title =  paste("K0=",as.integer(fitting_poly.coef[1])," K1=",signif(fitting_poly.coef[2],3)," K2=",signif(fitting_poly.coef[3],3), " r^2 =" ,signif(r.sqr,3)))
-plot_fit = plot_fit+ theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
+  labs(title = plot_fit_title)
+plot_fit = plot_fit+ theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
 plot_fit
 
 #slope
