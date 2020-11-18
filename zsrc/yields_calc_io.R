@@ -35,10 +35,10 @@ rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scrip
 if(!is.null(dev.list())) dev.off()
 #load function----------------------------------------------------------------------
 data_load_func = function(filename) {
-  cooldown = read.csv("../src/cooldown_data.csv", sep = ",", header = T)
+  cooldown = read.csv("../zsrc/cooldown_data.csv", sep = ",", header = T)
   dat = as.data.frame(read.csv(file = filename, sep = ",", skip = 28, header = T ))[,c(1:18)]
   tabla_complete <<- rbind(dat, cooldown)
-  yield_calc = function(tabla_complete, fitting_type, manual.coef) {source("../src/yields_calc_ext.R")}
+  yield_calc = function(tabla_complete, fitting_type, manual.coef) {source("../zsrc/yields_calc_ext.R")}
   yield_calc(tabla_complete)
   
   fig_temp <- ggarrange( plot_TwoSide, plot_Sunset, labels = c("Sunset laser", "Sunset protocol"),  nrow = 2, ncol = 1)
