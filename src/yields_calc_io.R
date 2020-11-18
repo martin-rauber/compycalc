@@ -18,7 +18,7 @@ result_filename = basename(getwd())
 ####################################################################################
 
 #load libraries & install packages if necessary-------------------------------------
-load.lib = c("ggpubr", "pastecs", "dplyr", "ggplot2", "pracma", "signal","gridGraphics", "pdftools")   
+load.lib = c("ggpubr", "pastecs", "dplyr", "ggplot2", "pracma", "signal","gridGraphics", "pdftools","outliers")   
 install.lib = load.lib[!load.lib %in% installed.packages()]
 for(lib in install.lib) install.packages(lib,dependencies=TRUE)
 sapply(load.lib,require,character=TRUE)
@@ -59,6 +59,13 @@ if(!is.null(dev.list())) dev.off()
 #rm(list=setdiff(ls(), c("df","result_filename", "csv_raw", "csv_stat", "csv_mean", "r_scripts", "home_wd","F14C_EC_raw_data")))
 df$filter = c(rep(result_filename, length(df$tabla_resultados2.EC_yield)))
 colnames(df) = c("EC_yield", "charring_S1", "charring_S2", "charring_S3", "filter_name")
+
+###dev: remove outliers with z-scores 
+z_score_value <- 1
+#df_calc <- df[-c(unique(which((abs(scores(df[,2:5],type="z"))>z_score_value) == TRUE, arr.ind=TRUE)[,1])),]
+#df_calc <- scores(df[,2:5],type="z")
+df_calc <- df[,2:5]
+
 #extract specific data--------------------------------------------------------------
 df_length = length(df$EC_yield)
 df_charr = data.frame("charring value" = c(df$charring_S1,df$charring_S2,df$charring_S3), "Sunset step" = c(rep("S1",df_length), rep("S2",df_length), rep("S3",df_length)), stringsAsFactors = FALSE)
