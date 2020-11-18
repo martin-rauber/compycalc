@@ -2,28 +2,6 @@
 #correction to 100% EC-yield
 ####################################################################################
 
-#F14C_raw_data = 
-
-#load EC-yield data from csv
-# Y_meas = read.csv("Version 1.0.3-mean-summary.csv")
-# Y_meas = as.data.frame(Y_meas[,3])
-# Y_meas
-# #load EC F14C raw data
-# F_meas = read.csv("MR01-143-EC-F14C-raw-data.csv")
-# F_meas
-
-
-  
-#####
-
-#F_meas<-c(0.876,0.599,0.644); Y_meas<-c(0.666,0.862,0.854) #data input manually. Use this one better
-
-#####
-
-#source(EC loss-fractionation theoryC short)
-
-
-
   ###Gary###
   
   library(MASS)
@@ -84,18 +62,9 @@ for (counter in c(1:14)) {  #data collection from paper
 
 #get EC-yield data
 Y_meas = EC_yield_mean_summary
-#Y_meas = Y_meas[,3]
+
 #get EC F14C raw data
 F_meas = F14C_raw_data
-#F_meas=F_meas[,]
-
-#F_meas<-c(0.876,0.599,0.644); Y_meas<-c(0.666,0.862,0.854) #data input manually. Use this one better
-
-# Y_meas<-c(0.666,0.862,0.854)
-# str(Y_meas)
-# F_meas<-c(0.876,0.599,0.644)
-# str(F_meas)
-#F_meas<-c(0.876,0.599,0.644); Y_meas<-c(0.666,0.862,0.854) #data input manually. Use this one better
 
 #####
 
