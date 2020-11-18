@@ -1,5 +1,5 @@
 ####################################################################################
-#Version information: yields_calc_ext for version 1.0.2
+#Version information: yields_calc_ext 
 ####################################################################################
 
 #Load libraries----------------------------------------------------------------------
@@ -281,14 +281,14 @@ if (fitting_type=="manual") {
 if (fitting_type=="expo") {
   laser_corr<-ls0 + fitting_expo.coef[1]*(exp(fitting_expo.coef[2]*(ms0-temp_lag))/(fitting_expo.coef[3]+exp(fitting_expo.coef[2]*(ms0-temp_lag)))) #exponential fitting
   fitting.coef<-fitting_expo.coef
-  plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_expo.coef[1])," K1=",signif(fitting_expo.coef[2],3)," K2=",signif(fitting_expo.coef[3],3)," r^2=",signif(r.sqr,3)))
-  lines(ms,predict(fitting_expo,data.frame(x=ms)),col="blue")
+ # plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_expo.coef[1])," K1=",signif(fitting_expo.coef[2],3)," K2=",signif(fitting_expo.coef[3],3)," r^2=",signif(r.sqr,3)))
+ # lines(ms,predict(fitting_expo,data.frame(x=ms)),col="blue")
 }
 if (fitting_type=="poly" || fitting_type=="manual") {
   laser_corr<-(fitting_poly.coef[3]*temp_lag^2)+(fitting_poly.coef[2]*temp_lag)+fitting_poly.coef[1]
   fitting.coef<-fitting_poly.coef
-  plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_poly.coef[1])," K1=",signif(fitting_poly.coef[2],3)," K2=",signif(fitting_poly.coef[3],3)," r^2=",signif(r.sqr,3)))
-  lines(temp_lag,laser_corr,col="blue")
+ # plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_poly.coef[1])," K1=",signif(fitting_poly.coef[2],3)," K2=",signif(fitting_poly.coef[3],3)," r^2=",signif(r.sqr,3)))
+ # lines(temp_lag,laser_corr,col="blue")
 }
 
 ATN<--100*log(laser_smooth/laser_corr)
@@ -456,15 +456,15 @@ if (fitting_type=="manual") {
   print(max(laser_smooth))
   print(K0_best)
   
-  plot(yields_calc$K0,yields_calc$EC1,type="b",ylim=c(0,1.1))
-  for (a in c(6:7)) {points(yields_calc[,1],yields_calc[,a],type="b")}
-  lines(c(0,max(yields_calc$K0)),c(1,1))
+#  plot(yields_calc$K0,yields_calc$EC1,type="b",ylim=c(0,1.1))
+#  for (a in c(6:7)) {points(yields_calc[,1],yields_calc[,a],type="b")}
+#  lines(c(0,max(yields_calc$K0)),c(1,1))
   
-  plot(yields_calc[,1],yields_calc$char1,type="b",ylim=c(-0.5,0.5))
-  for (a in c(9:10)) {points(yields_calc[,1],yields_calc[,a],type="b")}
-  lines(c(0,max(yields_calc$K0)),c(0,0))
+#  plot(yields_calc[,1],yields_calc$char1,type="b",ylim=c(-0.5,0.5))
+#  for (a in c(9:10)) {points(yields_calc[,1],yields_calc[,a],type="b")}
+# lines(c(0,max(yields_calc$K0)),c(0,0))
   
-  plot(yields_calc[,1],yields_calc$Q.laser_ATN,type="b")
+#  plot(yields_calc[,1],yields_calc$Q.laser_ATN,type="b")
 }
 
 
