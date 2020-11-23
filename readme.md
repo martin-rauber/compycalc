@@ -3,7 +3,7 @@
 
 ##  General usage 
 
-To use the compycalc program, follow the four steps written in the comment section of the `compycalc.R` file. This is the file you want to run, the other files in the subfolder are linked to this script. In the first section, you are asked to set the working directory, either with the command `setwd()` or by going to Session --> Set Working Directory --> To Source File Location in R Studio. 
+To use the COMPYCALC program, follow the four steps written in the comment section of the `compycalc.R` file. This is the file you want to run, the other files in the subfolder are linked to this script. In the first section, you are asked to set the working directory, either with the command `setwd()` or by going to Session --> Set Working Directory --> To Source File Location in R Studio. 
 
 ```
 #set wd-----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ To use the compycalc program, follow the four steps written in the comment secti
 #setwd("")
 ```
 
-In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the compycalc script to the folder where your data is. Now please be aware that the script will take the last digit of each folder for naming, so at best name your folders with xxx-[letter] (xxx-A, xxx-B, …). 
+In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Now please be aware that the script will take the last digit of each folder for naming, so at best name your folders with xxx-[letter] (xxx-A, xxx-B, …). 
 
 ```
 #add data---------------------------------------------------------------------------
@@ -52,11 +52,15 @@ Finally, you are ready to run the code.
 #         - wd folder will get "your-wd-name-here"-mean-summary-with-F14C.csv and "your-wd-name-here"-F14C_and_EC-yield-and-charring-summary.pdf
 ```
 
-These For best results, you use the uncorrected EC and OC values, run compycalc and and use the corrected EC and OC F14C values for a second run. After this iteration, the differences should be minuscule and you can use the fine EC and OC data. 
+These For best results, you use the uncorrected EC and OC values, run COMPYCALC and and use the corrected EC and OC F14C values for a second run. After this iteration, the differences should be minuscule and you can use the fine EC and OC data. 
 
 ## Other settings
 
 There are a few things you can also change in the first section of the `yields_calc_ext.R` file, however, preferably do not change anything if you do not know what you are doing. Also, if you make any changes to the program locally, make sure that you note that. Because you are working with a script and not with a package or a shiny app, you need to be very careful about that. 
+
+## How does COMPYCALC work?
+
+Please have a look at the scheme [How-does-COMPYCALC-work](https://github.com/martin-rauber/compycalc/blob/master/How-does-COMPYCALC-work.pdf). 
 
 ## Repository
 
