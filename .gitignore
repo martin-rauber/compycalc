@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.DS_Store
 compycalc test sets/
 compycalc extra data/
 old compycalc versions/

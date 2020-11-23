@@ -183,7 +183,7 @@ EC_yield_mean_summary = as.data.frame(df_stats_mean[,2])
 EC_yield_mean_summary = EC_yield_mean_summary[,]
 #import EC F14C raw data: top of file
 
-#Correction of F14C to 100% EC-yield
+#Extrapolation of F14C to 100% EC-yield
 source("zsrc/corr_100_EC.R")
 
 #calculate F14C_EC100_0charr
