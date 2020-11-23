@@ -1,5 +1,7 @@
 ####################################################################################
-#Version information: yields_calc_ext 
+#yields_calc_ext.R to calculate the EC-yield
+####################################################################################
+#This part of the code was written by Gary Salazar:  gary.salazar@dcb.unibe.ch
 ####################################################################################
 
 #Load libraries----------------------------------------------------------------------
@@ -507,16 +509,6 @@ if (fitting_type=="manual") {
   print(yields_calc)
   print(max(laser_smooth))
   print(K0_best)
-  
-#  plot(yields_calc$K0,yields_calc$EC1,type="b",ylim=c(0,1.1))
-#  for (a in c(6:7)) {points(yields_calc[,1],yields_calc[,a],type="b")}
-#  lines(c(0,max(yields_calc$K0)),c(1,1))
-  
-#  plot(yields_calc[,1],yields_calc$char1,type="b",ylim=c(-0.5,0.5))
-#  for (a in c(9:10)) {points(yields_calc[,1],yields_calc[,a],type="b")}
-# lines(c(0,max(yields_calc$K0)),c(0,0))
-  
-#  plot(yields_calc[,1],yields_calc$Q.laser_ATN,type="b")
 }
 
 

@@ -1,5 +1,5 @@
 ###################################################################################
-#yields calc io based on yield calc v1.0.6.3
+#yields calc io
 ###################################################################################
 #README
 #The following files need to be in the same folder and set to the working directory:

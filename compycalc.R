@@ -1,6 +1,9 @@
 ####################################################################################
 #COMPYCALC: COMprehensive Yield CALCulation 
 ####################################################################################
+#a tool to perform 14C OC/EC corrections with Sunset OC/EC analyzer laser data
+#written by Martin Rauber and Gary Salazar
+# Github: https://github.com/martin-rauber/compycalc
 #Version information: 1.1.5
 ####################################################################################
 #USER: follow the four instructions and run the script
@@ -37,7 +40,9 @@
 #OUTPUT          
 #         - each folder with measurements will get three files: "last-digit-of-folder"-mean-results.csv, "last-digit-of-folder"-raw-results.csv, "last-digit-of-folder"-stats.csv
 #         - wd folder will get "your-wd-name-here"-mean-summary-with-F14C.csv and "your-wd-name-here"-F14C_and_EC-yield-and-charring-summary.pdf
-             
+
+####################################################################################
+#USER: DO NOT change the script below this line                      
 ####################################################################################
 # prep.
 ####################################################################################
@@ -266,9 +271,8 @@ annotate_figure(fig_summary, top = text_grob(paste("\n",basename(getwd())," summ
                bottom = text_grob(paste(compycalc_version, "   ", Sys.info()[["user"]],Sys.time(), "  ",sep=" "), color = "black",  face = "italic", size = 10),)
 dev.off()
 
-
 ####################################################################################
-#LOG fileversions
+#LOG file versions
 ####################################################################################
 
 #v1.1.5: handful of changes in the corr_100_EC.R file as a result of the F14C_100EC correction issues in the WS01-003 EC data (measured with magazine C200610WSG and C200615WSG)

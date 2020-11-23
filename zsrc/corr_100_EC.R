@@ -1,9 +1,9 @@
 ####################################################################################
-#correction to 100% EC-yield
+#corr_100EC.R: correction to 100% EC-yield
 ####################################################################################
-
-  ###Gary###
-  
+#This part of the code was written by Gary Salazar: gary.salazar@dcb.unibe.ch
+####################################################################################
+ 
   library(MASS)
 SS_for_a<-function(par) {
   a<-par[1:n_taken];b<-b_fixed;T<-par[(n_taken+1):length(par)]
