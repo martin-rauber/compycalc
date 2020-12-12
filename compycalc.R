@@ -1,12 +1,15 @@
 ####################################################################################
-#COMPYCALC: COMprehensive Yield CALCulation 
 ####################################################################################
-#a tool to perform 14C OC/EC corrections with Sunset OC/EC analyzer laser data
+# COMPYCALC: COMprehensive Yield CALCulation 
+# A tool for EC yield extrapolation and charring correction 
+####################################################################################
 #written by Martin Rauber and Gary Salazar
 # Github: https://github.com/martin-rauber/compycalc
 #Version information: 1.1.5
 ####################################################################################
-#USER: follow the four instructions and run the script
+#USER:  follow the instructions and run the script
+#       details are written in the readme
+####################################################################################
 ####################################################################################
 
 #set wd-----------------------------------------------------------------------------
@@ -43,6 +46,7 @@
 
 ####################################################################################
 #USER: DO NOT change the script below this line                      
+####################################################################################
 ####################################################################################
 # prep.
 ####################################################################################
@@ -271,62 +275,6 @@ annotate_figure(fig_summary, top = text_grob(paste("\n",basename(getwd())," summ
                bottom = text_grob(paste(compycalc_version, "   ", Sys.info()[["user"]],Sys.time(), "  ",sep=" "), color = "black",  face = "italic", size = 10),)
 dev.off()
 
-####################################################################################
-#LOG file versions
-####################################################################################
-
-#v1.1.5: handful of changes in the corr_100_EC.R file as a result of the F14C_100EC correction issues in the WS01-003 EC data (measured with magazine C200610WSG and C200615WSG)
-
-#changes to corr_100_EC.R
-#8,6:
-#new      alfa.nv<-exp(log(alfa0)*exp(5-(1/T))) # non volatile
-#old      alfa.nv<-exp(log(alfa0)*exp(Ea_RT0-(1/T))) # non volatile
-#new      alfa.v<-exp(log(alfa0)*exp(Ea_RT0-(b/T)))  # volatile
-#old      alfa.v<-exp(log(alfa0)*exp(5-(b/T)))  # volatile
- 	
-#18,6:
-#new      alfa.nv<-exp(log(alfa0)*exp(Ea_RT0-(1/T))) # non volatile
-#old      alfa.nv<-exp(log(alfa0)*exp(5-(1/T))) # non volatile
-#new      alfa.v<-exp(log(alfa0)*exp(Ea_RT0-(b/T)))  # volatile
-#old      alfa.v<-exp(log(alfa0)*exp(5-(b/T)))  # volatile
-
-#25,6:
-#new      alfa.nv<-exp(log(alfa0)*exp(Ea_RT0-(1/T))) # non volatile
-#old      alfa.nv<-exp(log(alfa0)*exp(5-(1/T))) # non volatile
-#new      alfa.v<-exp(log(alfa0)*exp(Ea_RT0-(b/T)))  # volatile
-#old      alfa.v<-exp(log(alfa0)*exp(5-(b/T)))  # volatile
-
-#35,6
-#new      alfa.nv<-exp(log(alfa0)*exp(Ea_RT0-(1/T))) # non volatile
-#old      alfa.nv<-exp(log(alfa0)*exp(5-(1/T))) # non volatile
-#new      alfa.v<-exp(log(alfa0)*exp(Ea_RT0-(b/T)))  # volatile
-#old      alfa.v<-exp(log(alfa0)*exp(5-(b/T)))  # volatile
-
-#70,5
-#new      Ea_RT0<-7.5   # ----> max Ea/RT0 value <---  
-
-#79,5
-#new      up_par<-c(rep(Ea_RT0,n),rep(0.25,n))             #vector of upper bound a's and T's
-#old      up_par<-c(rep(5,n),rep(0.25,n))  
-
-#92,5
-#new      up_par<-c(rep(Ea_RT0,n_taken),rep(0.25,n_taken))             #vector of upper bound a's and T's
-#old      up_par<-c(rep(5,n_taken),rep(0.25,n_taken)) 
-
-#101,6
-#new      alfa.nv.all<-alfa0^(exp(Ea_RT0-(1/T))) # non volatile
-#old      alfa.nv.all<-alfa0^(exp(5-(1/T))) # non volatile
-#new      alfa.v.all<-alfa0^(exp(Ea_RT0-(b_fixed/T)))  # volatile
-#old      alfa.v.all<-alfa0^(exp(5-(b_fixed/T)))  # volatile
-
-#113,6
-#new      alfav_err_T<-b_fixed*log(alfa0)*exp(Ea_RT0-(b_fixed/T))*(1/T^2)*alfa0^(exp(Ea_RT0-(b_fixed/T)))
-#old      alfav_err_T<-b_fixed*log(alfa0)*exp(5-(b_fixed/T))*(1/T^2)*alfa0^(exp(5-(b_fixed/T)))
-#new      alfanv_err_T<-log(alfa0)*exp(Ea_RT0-(1/T))*(1/T^2)*alfa0^(exp(Ea_RT0-(1/T)))
-#old      alfanv_err_T<-log(alfa0)*exp(5-(1/T))*(1/T^2)*alfa0^(exp(5-(1/T)))
-
-#v1.1.4 Wildcard added to OC and EC F14C csv import
-#v1.1.2 to 1.1.3.R: bug when subfolders go beyond src (letter S), so src changed to zsrc
 
 ####################################################################################
 #end COMPYCALC
