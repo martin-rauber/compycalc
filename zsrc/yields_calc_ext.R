@@ -1,7 +1,6 @@
 ####################################################################################
-#yields_calc_ext.R to calculate the EC-yield
-####################################################################################
-#This part of the code was written by Gary Salazar:  gary.salazar@dcb.unibe.ch
+#yields_calc_ext
+#this section of code was written by Gary Salazar: gary.salazar@dcb.unibe.ch
 ####################################################################################
 
 #Load libraries----------------------------------------------------------------------
@@ -166,11 +165,11 @@ request<-as.vector(tabla_complete[,10])
 co2<-as.vector(tabla_complete[,16])
 largo<-length(x)
 
-# par(mfrow=c(3,1))  #print raw data
-# plot(x,laser,type="l")
-# plot(x,co2,type="l")
-# plot(x,temp,type="l")
-# par(mfrow=c(1,1))
+par(mfrow=c(3,1))  #print raw data
+plot(x,laser,type="l")
+plot(x,co2,type="l")
+plot(x,temp,type="l")
+par(mfrow=c(1,1))
 
 #---------------------------smooth moving average of 20 back ---raw to lag ---------------------------
 if (average_type=="centered") {
@@ -285,34 +284,29 @@ if (fitting_type=="manual") {
 if (fitting_type=="expo") {
   laser_corr<-ls0 + fitting_expo.coef[1]*(exp(fitting_expo.coef[2]*(ms0-temp_lag))/(fitting_expo.coef[3]+exp(fitting_expo.coef[2]*(ms0-temp_lag)))) #exponential fitting
   fitting.coef<-fitting_expo.coef
- # plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_expo.coef[1])," K1=",signif(fitting_expo.coef[2],3)," K2=",signif(fitting_expo.coef[3],3)," r^2=",signif(r.sqr,3)))
- # lines(ms,predict(fitting_expo,data.frame(x=ms)),col="blue")
+  plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_expo.coef[1])," K1=",signif(fitting_expo.coef[2],3)," K2=",signif(fitting_expo.coef[3],3)," r^2=",signif(r.sqr,3)))
+  lines(ms,predict(fitting_expo,data.frame(x=ms)),col="blue")
 }
 if (fitting_type=="poly" || fitting_type=="manual") {
   laser_corr<-(fitting_poly.coef[3]*temp_lag^2)+(fitting_poly.coef[2]*temp_lag)+fitting_poly.coef[1]
   fitting.coef<-fitting_poly.coef
- # plot(ms,ls,col="red",main=paste("K0=",as.integer(fitting_poly.coef[1])," K1=",signif(fitting_poly.coef[2],3)," K2=",signif(fitting_poly.coef[3],3)," r^2=",signif(r.sqr,3)))
- # lines(temp_lag,laser_corr,col="blue")
-}
-
-ATN<--100*log(laser_smooth/laser_corr)
-
-#title for plot_fit
-plot_fit_title <- bquote(K[0] == .(as.integer(fitting_poly.coef[1])) ~ " " ~ K[1] == .(signif(fitting_poly.coef[2],3))~ " " ~ K[2] == .(signif(fitting_poly.coef[3],3))~ " " ~r^2 == .(signif(r.sqr,3)))
+  
+  ATN<--100*log(laser_smooth/laser_corr)
+  
+  #title for plot_fit
+  plot_fit_title <- bquote(K[0] == .(as.integer(fitting_poly.coef[1])) ~ " " ~ K[1] == .(signif(fitting_poly.coef[2],3))~ " " ~ K[2] == .(signif(fitting_poly.coef[3],3))~ " " ~r^2 == .(signif(r.sqr,3)))
 #plot_fit
-temp_laser_data = as.data.frame(cbind(temp_lag,laser_corr))
-theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
-plot_fit = ggplot(ds, aes(x=ms, y=ls)) +
-  geom_point(shape=20, color ="red")+
-  geom_line(temp_laser_data, mapping = aes(temp_lag,laser_corr),col="blue")+
-  xlab("Temperature (°C)")+
-  ylab("Laser signal (a.u.)")+
-  labs(title = plot_fit_title)
-plot_fit = plot_fit+ theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
-plot_fit
-
-#slope
-charr_corr_slope <- signif(fitting_poly.coef[2],3)
+  temp_laser_data = as.data.frame(cbind(temp_lag,laser_corr))
+  theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
+  plot_fit = ggplot(ds, aes(x=ms, y=ls)) +
+    geom_point(shape=20, color ="red")+
+    geom_line(temp_laser_data, mapping = aes(temp_lag,laser_corr),col="blue")+
+    xlab("Temperature (°C)")+
+    ylab("Laser signal (a.u.)")+
+    labs(title = plot_fit_title)
+  plot_fit = plot_fit+ theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
+  plot_fit
+}
 
 #black is uncorrected smoothed laser, red is corrected smoothed laser, blue is ATN of corrected smoothed laser
 #data is normalised 
@@ -328,8 +322,8 @@ plot_TwoSide <- ggplot(laser_data_normalised) +
   xlab("Time (s)")+
   ylab("Normalised (%)")+
   labs(title = "black: unc laser, red: corr laser, blue: ATN" )
-plot_TwoSide <- plot_TwoSide + theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
-plot_TwoSide
+  plot_TwoSide <- plot_TwoSide + theme( plot.margin = margin(0.5, 0.5, 0.5, 0.5, "in"))
+  plot_TwoSide
 
 # par(mfrow=c(3,1))
 # plot(x_lag,ATN,type="l")
@@ -337,13 +331,14 @@ plot_TwoSide
 # plot(x_lag,temp_lag,type="l")
 # par(mfrow=c(1,1))
 
+
 #---------------------- find time points by requested T bracket search ----------------
 if (split_point_algoritm=="temperature") {
   
   data_search_x<-c(); data_search_y<-c() 
   request_jumps2_index<-c(); request_jumps2_T<-c()
-  # plot(x_lag,request_lag, type="l")
-  # lines(x_lag,temp_lag, type="l")
+  plot(x_lag,request_lag, type="l")
+  lines(x_lag,temp_lag, type="l")
   request_jumps<-diff(request_lag)   #the derivative of the temp request gives accurately the temperature jumps
   request_jumps2_index<-which(request_jumps!=0)    #position or index of the temp jumps
   request_jumps2_T<-request_jumps[request_jumps2_index]  #magnitude of the temp jumps
@@ -432,11 +427,12 @@ tabla_resultados<-data.frame("EC_yield"=c(EC_yield1,EC_yield2), "charring"=c(cha
 print(tabla_resultados)
 #write.table(tabla_resultados,"clipboard",sep="\t")
 
-tabla_resultados2<-data.frame("EC_yield"=c(tabla_resultados[3,1]), "charringS1"=c(tabla_resultados[1,2]), "charringS2"=c(tabla_resultados[2,2]), "charringS3"=c(tabla_resultados[3,2]))
+tabla_resultados2<-data.frame("EC_yield_S1"=c(tabla_resultados[1,1]), "EC_yield_S2"=c(tabla_resultados[2,1]), "EC_yield_S3"=c(tabla_resultados[3,1]), "charring_S1"=c(tabla_resultados[1,2]), "charring_S2"=c(tabla_resultados[2,2]), "charring_S3"=c(tabla_resultados[3,2]), "charring_total"=c(tabla_resultados[1,2])+c(tabla_resultados[2,2])+c(tabla_resultados[3,2]))
 #tabla_resultados2<-data.frame(tabla_resultados[3,1], tabla_resultados[1,2], tabla_resultados[2,2], tabla_resultados[3,2])
 print(tabla_resultados2)
 
 ATN_rango<-max(ATN)-min(ATN); ATN_medio<-ATN_rango/2
+
 ###ggplot plot_Sunset
 plot_Sunset_data <- as.data.frame(cbind(x_lag,temp_lag/max(temp_lag),ATN))
 colnames(plot_Sunset_data) <- c("x_lag","temp_lag_norm", "ATN")
@@ -465,6 +461,10 @@ plot_TwoSide <- ggplot(laser_data_normalised) +
   labs(title = "black: unc laser, red: corr laser, blue: ATN" )
 plot_TwoSide <- plot_TwoSide + theme( plot.margin = margin(0.5, 0.5, 1, 0.5, "in"))
 plot_TwoSide
+
+###
+
+
 if (error_message=="") {print("no errors")}
 print(error_message)
 
@@ -509,7 +509,17 @@ if (fitting_type=="manual") {
   print(yields_calc)
   print(max(laser_smooth))
   print(K0_best)
+  
+  plot(yields_calc$K0,yields_calc$EC1,type="b",ylim=c(0,1.1))
+  for (a in c(6:7)) {points(yields_calc[,1],yields_calc[,a],type="b")}
+  lines(c(0,max(yields_calc$K0)),c(1,1))
+  
+  plot(yields_calc[,1],yields_calc$char1,type="b",ylim=c(-0.5,0.5))
+  for (a in c(9:10)) {points(yields_calc[,1],yields_calc[,a],type="b")}
+  lines(c(0,max(yields_calc$K0)),c(0,0))
+  
+  plot(yields_calc[,1],yields_calc$Q.laser_ATN,type="b")
 }
 
-
+#end
 

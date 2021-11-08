@@ -52,8 +52,7 @@ filename <- dir(".",pattern="^(.*)txt$")
 df_raw <- NULL
 for (i in filename){
   data_load_func(i)
-  df_raw <- rbind(df_raw, data.frame(tabla_resultados2$EC_yield,tabla_resultados2$charringS1,tabla_resultados2$charringS2,tabla_resultados2$charringS3))
-}
+  df_raw <- rbind(df_raw, data.frame(tabla_resultados2$EC_yield_S3,tabla_resultados2$charring_S1,tabla_resultados2$charring_S2,tabla_resultados2$charring_S3))}
 
 #rm(list=setdiff(ls(), c("df","result_filename", "csv_raw", "csv_stat", "csv_mean")))
 df_raw$filter <- c(rep(result_filename, length(df_raw$tabla_resultados2.EC_yield)))
