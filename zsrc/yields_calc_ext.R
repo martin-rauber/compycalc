@@ -308,6 +308,9 @@ if (fitting_type=="poly" || fitting_type=="manual") {
   plot_fit
 }
 
+#slope
+charr_corr_slope <- signif(fitting_poly.coef[2],3)
+
 #black is uncorrected smoothed laser, red is corrected smoothed laser, blue is ATN of corrected smoothed laser
 #data is normalised 
 
