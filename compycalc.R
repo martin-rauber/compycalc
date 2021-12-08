@@ -5,7 +5,6 @@
 ####################################################################################
 #written by Martin Rauber and Gary Salazar
 # Github: https://github.com/martin-rauber/compycalc
-#Version information: 1.1.5
 ####################################################################################
 #USER:  follow the instructions and run the script
 #       details are written in the readme
