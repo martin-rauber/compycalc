@@ -4,12 +4,13 @@
 #This part of the code was written by Gary Salazar: gary.salazar@dcb.unibe.ch
 ####################################################################################
  
-  library(MASS)
+library(MASS)
 alfa<-function(b) { #fixed T for 3 sunset steps
   alfa1<-exp(-t1*Kref*exp(Ea/R*((1/Tref)-(b/temp1))))
   alfa2<-alfa1*exp(-t2*Kref*exp(Ea/R*((1/Tref)-(b/temp2))))
   alfa3<-alfa2*exp(-t3*Kref*exp(Ea/R*((1/Tref)-(b/temp3))))
   alfa<-alfa3
+  #alfa<-exp(log(alfa0)*exp(5-(b/T)))
   return(alfa)
 }
 
@@ -19,7 +20,7 @@ SS_for_a<-function(par) {
   alfa.v<-alfa(rep(1,length(b)))  # volatile
   Ys<-(alfa.nv+(a*alfa.v))/(1+a)
   Fs<-((a*alfa.v*Fv)+(alfa.nv*Fnv))/(Ys*(1+a))
-  sum_sqrs<-1/((F_meas_sig^2+Y_meas_sig^2))*sum((Fs-F_meas)^2+(Ys-Y_meas)^2)
+  sum_sqrs<-1/((F_meas_sig^2+Y_meas_sig^2))*sum((Fs-F_m)^2+(Ys-Y_m)^2)
   return(sum_sqrs)
 }
 
@@ -32,11 +33,11 @@ locations<-c("Gote wint", "Pay wint", "Pay sum", "Duben fall", "Duben fall2", "P
 
 data_n<-8
 F_meas<-c(); Y_meas<-c()
-for (counter in c(1:14)) {  #data collection from paper
-  data_n<-counter
-  F_m<-(data[[data_n]]*lin_par[data_n,1])+lin_par[data_n,2]; Y_m<-data[[data_n]]
-  if (counter==1) {F_meas<-F_m; Y_meas<-Y_m}
-  if (counter>1) {F_meas<-c(F_meas,F_m); Y_meas<-c(Y_meas,Y_m)} 
+for (counter in c(1:14)) {
+data_n<-counter
+F_calc<-(data[[data_n]]*lin_par[data_n,1])+lin_par[data_n,2]; Y_calc<-data[[data_n]]
+ if (counter==1) {F_meas<-F_calc; Y_meas<-Y_calc; color<-rep(counter,length(data[[counter]]))}
+ if (counter>1) {F_meas<-c(F_meas,F_calc); Y_meas<-c(Y_meas,Y_calc); color<-c(color,rep(counter,length(data[[counter]])))} 
 }
 
 #####
@@ -49,31 +50,37 @@ F_meas = F14C_EC_raw_data
 
 #####
 
-b0<-1.5 #----> b IS NOT FIXED <-----------
-a<-c(); alfa.nv.all<-c(); alfa.v.all<-c(); Ys.all<-c(); Fs.all<-c(); linmodel_slope<-c(); F0.all<-c()
-n<-length(Y_meas); Fnv<-0; Fv<-1.11; Fnv_sig<-0.03; Fv_sig<-0.03*Fv; F_meas_sig<-0.03;Y_meas_sig<-0.01
-Kref<-0.00003; Tref<-673; Ea<-90; R<-8.31E-3
-#three sunset steps temperature and times
+b0<-2.0 #----> b IS NOT FIXED <-----------
+Fnv<-0; Fv<-1.11; R<-8.31E-3
+#Kref<-8E-7; Tref<-573; Ea<-100
+Kref<-1.2E-6; Tref<-573; Ea<-100
+Fnv_sig<-0.03; Fv_sig<-0.03*Fv; F_meas_sig<-0.03;Y_meas_sig<-0.01
 temp1<-648; temp2<-698; temp3<-973
 t1<-240; t2<-120; t3<-120
+a<-c(); b<-c(); alfa.nv.all<-c(); alfa.v.all<-c(); Ys.all<-c(); Fs.all<-c(); linmodel_slope<-c(); F0.all<-c()
+total_n<-length(Y_meas); n<-1
 
 #calc a, b using whole data together
-initial_par<-c(rep(1,n),rep(b0,n))          #vector of initial a's and b's
-low_par<-c(rep(0.005,n),rep(0.90,n))       #vector of lower bound a's and b's
-up_par<-c(rep(4,n),rep(4*b0,n))             #vector of upper bound a's and b's
+for (counter in c(1:total_n)) {
+Y_m<-Y_meas[counter]; F_m<-F_meas[counter]
+
+initial_par<-c(rep(1,1),rep(b0,1))          #vector of initial a's and b's
+low_par<-c(rep(0.005,1),rep(1.05,1))       #vector of lower bound a's and b's
+up_par<-c(rep(5,1),rep(2*b0,1))             #vector of upper bound a's and b's
 model3<-optim(initial_par,SS_for_a,lower=low_par,upper=up_par,method="L-BFGS-B",hessian=TRUE) #error MINIMIZATION changing a & T on non linear model
-a<-model3$par[1:n]; b<-model3$par[(n+1):(2*n)]
+a<-c(a,model3$par[1:n]); b<-c(b,model3$par[(n+1):(2*n)])
+}
 
 #H<-model3$hessian/2
 #C<-ginv(H);variance<-diag(C)                   #diagonal of inverse hessian
 #a_sig<-sqrt(abs(variance[1:n])); b_sig<-sqrt(abs(variance[(n+1):(2*n)])) #vector of uncertainties of a's and b's from hessian
 
-alfa.nv.all<-alfa(b) # non volatile with fixed 3 thermal steps
-alfa.v.all<-alfa(rep(1,length(b)))  # volatile with fixed 3 thermal steps
+alfa.nv.all<-alfa(b) # non volatile
+alfa.v.all<-alfa(rep(1,length(b)))  # volatile
 Ys.all<-(alfa.nv.all+(a*alfa.v.all))/(1+a) #calculated yield
 Fs.all<-((a*alfa.v.all*Fv)+(alfa.nv.all*Fnv))/(Ys.all*(1+a)) #calculated Fm
-linmodel_slope<-((a*Fv/(1+a))-F_meas)/(1-Y_meas)  #slope of linear model
 F0.all<-((a*Fv)+Fnv)/(1+a)  #Fm correction by extrapolation to yield=1 non linear model
+linmodel_slope<-(F0.all-F_meas)/(1-Y_meas)  #slope of linear model
 
 #error calculation for the above section by propagation
 #F_meas_sig<-(sum((F_meas-Fs.all)^2))/n;Y_meas_sig<-(sum((Y_meas-Ys.all)^2))/n 
