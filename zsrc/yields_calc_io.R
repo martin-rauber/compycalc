@@ -31,7 +31,7 @@ IQR <- 1.5
 ####################################################################################
 
 #clean up environment---------------------------------------------------------------
-rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scripts", "home_wd","F14C_EC_raw_data","F14C_OC_raw_data","charr_corr_slope","IQR" )))
+rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scripts", "home_wd","F14C_EC_raw_data","F14C_OC_raw_data","F14C_EC_u","charr_corr_slope","IQR" )))
 if(!is.null(dev.list())) dev.off()
 #load function----------------------------------------------------------------------
 data_load_func = function(filename) {

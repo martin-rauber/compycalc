@@ -15,7 +15,7 @@
 
 # 1)  set the working directory (wd) for COMPYCALC: this folder must contain the compycalc R
 #     file and the folder /zsrc containing the scripts. The wd name will be used to name the 
-#     result files. 
+#     result files. Note that no other files should be in the folder, including hidden files.
 
 #setwd("")
 
@@ -24,18 +24,15 @@
 # 2)  Sunset data
 #     Add your folder(s) with the individual Sunset measurement(s) to the wd folder. 
 
-# 3)  enter F14C EC and OC raw data and add desired slope
+# 3)  enter F14C EC and OC raw data
           ##EC: import from csv
-          F14C_EC_raw_data = read.csv(list.files(".",pattern = "*EC-F14C-raw-data.csv" ,  recursive = TRUE), header = TRUE)
-          F14C_EC_raw_data = F14C_EC_raw_data[,]
-          #OR enter here manually
-          #F14C_EC_raw_data = c()
+          F14C_EC_raw_data <- read.csv(list.files(".",pattern = "*EC-F14C-raw-data.csv" ,  recursive = FALSE), header = TRUE)
+          F14C_EC_u <- F14C_EC_raw_data[,2]
+          F14C_EC_raw_data <- F14C_EC_raw_data[,1]
           
           ##OC: import from csv
-          F14C_OC_raw_data = read.csv(list.files(".",pattern = "*OC-F14C-raw-data.csv" ,  recursive = TRUE), header = TRUE)
-          F14C_OC_raw_data = F14C_OC_raw_data[,]
-          #OR enter here manually
-          #F14C_OC_raw_data = c()
+          F14C_OC_raw_data <- read.csv(list.files(".",pattern = "*OC-F14C-raw-data.csv" ,  recursive = FALSE), header = TRUE)
+          F14C_OC_raw_data <- F14C_OC_raw_data[,]
           
 # 4)  run script
           
@@ -47,7 +44,7 @@
 #USER: DO NOT change the script below this line                      
 ####################################################################################
 ####################################################################################
-# prep.
+# preparation
 ####################################################################################
 #load libraries & install packages if necessary-------------------------------------
 load.lib = c("ggpubr", "dplyr", "data.table", "purrr", "stringr", "pastecs","readxl","MASS", "ggplot2", "pracma", "signal","gridGraphics", "pdftools", "outliers")   
@@ -55,7 +52,6 @@ install.lib = load.lib[!load.lib %in% installed.packages()]
 for(lib in install.lib) install.packages(lib,dependencies=TRUE)
 sapply(load.lib,require,character=TRUE)
 #clean up environment---------------------------------------------------------------
-#rm(list=setdiff(ls(), c("result_filename", "csv_raw", "csv_stat", "csv_mean","fitting_type","manual.coef", "r_scripts", "home_wd","F14C_EC_raw_data","F14C_OC_raw_data")))
 if(!is.null(dev.list())) dev.off()
 #save home wd-----------------------------------------------------------------------
 home_wd = getwd()
@@ -73,7 +69,6 @@ for(j in sub_folders) {
   setwd(j)
   source(r_scripts)
 }
-
 
 ####################################################################################
 # generate summary boxplots for EC-yield and charring from all measurements
@@ -106,8 +101,6 @@ df_stats
 df_stats[is.element(df_stats$V1, "nbr.val"),]
 # mean for each  sample and export to csv with partent folder prefix
 df_stats_mean=df_stats[is.element(df_stats$V1, "mean"),]
-#save csv with EC-yield and charring
-#write.csv(df_stats_mean, file =  paste(basename(getwd()),"-mean-summary.csv",sep=""), row.names = F)
 
 #number of filters used for calc
 n_labs_calc <- df_stats[is.element(df_stats$V1, "nbr.val"),] 
@@ -184,13 +177,14 @@ fig_summary_charring
 #get EC-yield data
 EC_yield_mean_summary = as.data.frame(df_stats_mean[,2])
 EC_yield_mean_summary = EC_yield_mean_summary[,]
-#import EC F14C raw data: top of file
+
+#import EC F14C raw data --> beginning of script
 
 #Extrapolation of F14C to 100% EC-yield
 source("zsrc/corr_100_EC.R")
 
 #calculate F14C_EC100_0charr
-F14C_EC100 = F0.all
+F14C_EC100 <- F0.all
 df_charring$charring_total <- df_charring$charring_S1+df_charring$charring_S2+df_charring$charring_S3
 total_charr <- aggregate(x = df_charring$charring_total, by = list(df_charring$filter_name_short), FUN = mean) 
 colnames(total_charr) <- c("filter_name_short","total_charr_mean")
@@ -199,45 +193,61 @@ F14C_EC100_0_charr_a <- (F14C_EC100-F14C_OC_raw_data*0.5*total_charr$total_charr
 #F14C_EC100_0_charr_b: F14C charring (S1+S2+S3) corrected
 F14C_EC100_0_charr_b <- (F14C_EC_raw_data-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
 #F14C_EC100_0_charr_c: F14C with charring (both S1+S2+S3) + Slope correction (charr_corr_slope calculated in yields_calc_ext.R)
-F14C_EC100_0_charr_c <- charr_corr_slope*(1-df_stats_mean$EC_yield)+F14C_EC100_0_charr_b 
+print(df_stats_mean)
+F14C_EC100_0_charr_c <- charr_corr_slope*(1-df_stats_mean$`EC-yield`)+F14C_EC100_0_charr_b 
 #mean final correction to 0% charring
 F14C_EC100_0_charr <- cbind(F14C_EC100_0_charr_a, F14C_EC100_0_charr_c)
 F14C_EC100_0_charr <- rowMeans(F14C_EC100_0_charr)
 F14C_EC100_0_charr
 
-#export result as csv
-df_stats_mean_F14C = cbind(df_stats_mean[,6],df_stats_mean[,2:5],total_charr$total_charr_mean,as.data.frame(F14C_EC_raw_data), F14C_EC100, F14C_EC100_0_charr)
-colnames(df_stats_mean_F14C) = c("filter_name_short","EC_yield","charring_S1", "charring_S2","charring_S3", "charring_total","F14C_EC","F14C_EC100", "F14C_EC100_0_charr")
-write.csv(df_stats_mean_F14C, file =  paste(basename(getwd()),"-mean-summary-with-F14C.csv",sep=""), row.names = F)
+#estimate uncertainties
+# F14C_EC_u: input, measurement uncertainty;  F14C_EC100_u: uncertainty after correction to 100% EC yield; 
+# F14C_EC100_0_charr_u uncertainty after correction to 100% EC yield and correction to 0% charring
 
-#dev export with a b c results
-# df_stats_mean_F14C = cbind(df_stats_mean[,6],df_stats_mean[,2:5],total_charr$total_charr_mean,as.data.frame(F14C_EC_raw_data), F14C_EC100, F14C_EC100_0_charr,F14C_EC100_0_charr_a,F14C_EC100_0_charr_b,F14C_EC100_0_charr_c)
-# colnames(df_stats_mean_F14C) = c("filter_name_short","EC_yield","charring_S1", "charring_S2","charring_S3", "charring_total","F14C_EC","F14C_EC100", "F14C_EC100_0_charr","F14C_EC100_0_charr_a","F14C_EC100_0_charr_b","F14C_EC100_0_charr_c")
-# write.csv(df_stats_mean_F14C, file =  paste(basename(getwd()),"-mean-summary-with-F14C-dev.csv",sep=""), row.names = F)
+# uncertainty of the F14C(EC) corrected to 100% EC yield from the corr_100_EC script
+F14C_EC100_u <- F0.all_sig
+# preliminary uncertainty estimation of the correction to 0% charring
+F14C_EC100_0_charr_a_u <- sqrt((F14C_EC100_u-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)^2/(1-0.5*total_charr$total_charr_mean)^2)
+F14C_EC100_0_charr_b_u <- sqrt((F14C_EC_u-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)^2/(1-0.5*total_charr$total_charr_mean)^2)
+F14C_EC100_0_charr_c_u <- sqrt((charr_corr_slope*(1-df_stats_mean$`EC-yield`)+F14C_EC100_0_charr_b_u)^2)
+F14C_EC100_0_charr_u <- sqrt(F0.a_sig^2 + F14C_EC_u^2 +((F14C_EC100_0_charr_a_u+F14C_EC100_0_charr_c_u)/2)^2)
+
+#linear slope calculation for extrapolation to 100% EC
+linear_slope <- (F14C_EC100-F14C_EC_raw_data)/(1-df_stats_mean[,2])
+colnames(linear_slope) <- c("linear_slope")
+
+#export result as csv
+df_stats_mean_F14C <- cbind(df_stats_mean[,6],df_stats_mean[,2:5],total_charr$total_charr_mean,as.data.frame(F14C_EC_raw_data),F14C_EC_u, F14C_EC100,F14C_EC100_u, linear_slope,F14C_EC100_0_charr,F14C_EC100_0_charr_u)
+colnames(df_stats_mean_F14C) <- c("filter_name_short","EC_yield","charring_S1", "charring_S2","charring_S3", "charring_total","F14C_EC","F14C_EC_u","F14C_EC100","F14C_EC100_u", "linear_slope","F14C_EC100_0_charr","F14C_EC100_0_charr_u")
+write.csv(df_stats_mean_F14C, file <- paste(basename(getwd()),"-mean-summary-with-F14C.csv",sep=""), row.names = F)
 
 #plot raw vs corrected F14C values for each filter
 F14C_raw <- as.data.frame(F14C_EC_raw_data)
+F14C_raw$F14C_u <- F14C_EC_u
 F14C_raw$filter_name_short <- df_stats_mean_F14C$filter_name_short
 F14C_raw$class <- "uncorrected"
-F14C_raw <- F14C_raw[, c("filter_name_short","F14C_EC_raw_data", "class")]
-colnames(F14C_raw) <- c("filter_name_short","F14C", "class") 
+F14C_raw <- F14C_raw[, c("filter_name_short","F14C_EC_raw_data","F14C_u", "class")]
+colnames(F14C_raw) <- c("filter_name_short","F14C","F14C_u", "class") 
 #add values for EC-yield correction to 100%
-F14C_EC100_corr <- df_stats_mean_F14C[,c(1,8)]
+F14C_EC100_corr <- df_stats_mean_F14C[,c(1,9)]
+F14C_EC100_corr$F14C_u <- F14C_EC100_u
 F14C_EC100_corr$class <- "corr. to 100% EC-yield"
-colnames(F14C_EC100_corr) <- c("filter_name_short","F14C", "class") 
+colnames(F14C_EC100_corr) <- c("filter_name_short","F14C","F14C_u", "class") 
 F14C_EC100_corr
 #add values for EC-yield correction to 100% and 0% charring
-F14C_EC100_0_charr_corr <-  df_stats_mean_F14C[,c(1,9)]
+F14C_EC100_0_charr_corr <-  df_stats_mean_F14C[,c(1,12)]
+F14C_EC100_0_charr_corr$F14C_u <- F14C_EC100_0_charr_u
 F14C_EC100_0_charr_corr$class <- "corr. to 100% EC-yield at 0% charring"
-colnames(F14C_EC100_0_charr_corr) <- c("filter_name_short","F14C", "class") 
+colnames(F14C_EC100_0_charr_corr) <- c("filter_name_short","F14C","F14C_u", "class") 
 F14C_EC100_0_charr_corr
 all_F14C_data <- rbind(F14C_raw,F14C_EC100_corr,F14C_EC100_0_charr_corr)
 all_F14C_data
 
-#plot the corrected and uncorrected F14C value for each filter. If loop to adjust y axis for supermodern values
+#plot the corrected and uncorrected F14C value for each filter
 theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
-plot_all_F14C = ggplot(all_F14C_data, aes(x=filter_name_short, y=F14C)) +
+plot_all_F14C <- ggplot(all_F14C_data, aes(x=filter_name_short, y=F14C)) +
   geom_point(aes(shape= factor(class, levels = c("uncorrected","corr. to 100% EC-yield","corr. to 100% EC-yield at 0% charring")), color = factor(class, levels = c("uncorrected","corr. to 100% EC-yield","corr. to 100% EC-yield at 0% charring"))))+
+  geom_errorbar(mapping=aes(x=filter_name_short, ymin=F14C-F14C_u, ymax=F14C+F14C_u), width=0.15, size=0.2, color="black") +
   xlab("filter")+
   ylab(bquote(~ F^14~C))+
   scale_y_continuous(expand = c(0, 0), limits = c(0,
@@ -261,7 +271,7 @@ fig_summary_F14C_top = ggarrange(
 fig_summary_F14C_top
 
 #Version info in pdf
-compycalc_version = "pdf generated by COMPYCALC version 1.2.0"
+compycalc_version = "pdf generated by COMPYCALC version 1.2.x"
 
 #create a summary figure with F14C, EC-yield, and charring. Export plots as pdf 
 pdf(file =  paste(basename(getwd()),"-F14C_and_EC-yield-and-charring-summary.pdf",sep=""), width = 8.3 , height = 11.7)
@@ -273,7 +283,6 @@ fig_summary = ggarrange(
 annotate_figure(fig_summary, top = text_grob(paste("\n",basename(getwd())," summary",sep=""), color = "black" , face = "bold", size = 16),
                bottom = text_grob(paste(compycalc_version, "   ", Sys.info()[["user"]],Sys.time(), "  ",sep=" "), color = "black",  face = "italic", size = 10),)
 dev.off()
-
 
 ####################################################################################
 #end COMPYCALC

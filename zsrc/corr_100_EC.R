@@ -1,9 +1,9 @@
 ####################################################################################
 #corr_100EC.R: correction to 100% EC-yield
 ####################################################################################
-#This part of the code was written by Gary Salazar: gary.salazar@dcb.unibe.ch
+#This part of the code was written by Gary Salazar: gary.salazar@unibe.ch
 ####################################################################################
- 
+
 library(MASS)
 alfa<-function(b) { #fixed T for 3 sunset steps
   alfa1<-exp(-t1*Kref*exp(Ea/R*((1/Tref)-(b/temp1))))
@@ -34,10 +34,10 @@ locations<-c("Gote wint", "Pay wint", "Pay sum", "Duben fall", "Duben fall2", "P
 data_n<-8
 F_meas<-c(); Y_meas<-c()
 for (counter in c(1:14)) {
-data_n<-counter
-F_calc<-(data[[data_n]]*lin_par[data_n,1])+lin_par[data_n,2]; Y_calc<-data[[data_n]]
- if (counter==1) {F_meas<-F_calc; Y_meas<-Y_calc; color<-rep(counter,length(data[[counter]]))}
- if (counter>1) {F_meas<-c(F_meas,F_calc); Y_meas<-c(Y_meas,Y_calc); color<-c(color,rep(counter,length(data[[counter]])))} 
+  data_n<-counter
+  F_calc<-(data[[data_n]]*lin_par[data_n,1])+lin_par[data_n,2]; Y_calc<-data[[data_n]]
+  if (counter==1) {F_meas<-F_calc; Y_meas<-Y_calc; color<-rep(counter,length(data[[counter]]))}
+  if (counter>1) {F_meas<-c(F_meas,F_calc); Y_meas<-c(Y_meas,Y_calc); color<-c(color,rep(counter,length(data[[counter]])))} 
 }
 
 #####
@@ -62,18 +62,18 @@ total_n<-length(Y_meas); n<-1
 
 #calc a, b using whole data together
 for (counter in c(1:total_n)) {
-Y_m<-Y_meas[counter]; F_m<-F_meas[counter]
-
-initial_par<-c(rep(1,1),rep(b0,1))          #vector of initial a's and b's
-low_par<-c(rep(0.005,1),rep(1.05,1))       #vector of lower bound a's and b's
-up_par<-c(rep(5,1),rep(2*b0,1))             #vector of upper bound a's and b's
-model3<-optim(initial_par,SS_for_a,lower=low_par,upper=up_par,method="L-BFGS-B",hessian=TRUE) #error MINIMIZATION changing a & T on non linear model
-a<-c(a,model3$par[1:n]); b<-c(b,model3$par[(n+1):(2*n)])
+  Y_m<-Y_meas[counter]; F_m<-F_meas[counter]
+  
+  initial_par<-c(rep(1,1),rep(b0,1))          #vector of initial a's and b's
+  low_par<-c(rep(0.005,1),rep(1.05,1))       #vector of lower bound a's and b's
+  up_par<-c(rep(5,1),rep(2*b0,1))             #vector of upper bound a's and b's
+  model3<-optim(initial_par,SS_for_a,lower=low_par,upper=up_par,method="L-BFGS-B",hessian=TRUE) #error MINIMIZATION changing a & T on non linear model
+  a<-c(a,model3$par[1:n]); b<-c(b,model3$par[(n+1):(2*n)])
 }
 
-#H<-model3$hessian/2
-#C<-ginv(H);variance<-diag(C)                   #diagonal of inverse hessian
-#a_sig<-sqrt(abs(variance[1:n])); b_sig<-sqrt(abs(variance[(n+1):(2*n)])) #vector of uncertainties of a's and b's from hessian
+H<-model3$hessian/2
+C<-ginv(H);variance<-diag(C)                   #diagonal of inverse hessian
+a_sig<-sqrt(abs(variance[1:n])); b_sig<-sqrt(abs(variance[(n+1):(2*n)])) #vector of uncertainties of a's and b's from hessian
 
 alfa.nv.all<-alfa(b) # non volatile
 alfa.v.all<-alfa(rep(1,length(b)))  # volatile
@@ -81,16 +81,20 @@ Ys.all<-(alfa.nv.all+(a*alfa.v.all))/(1+a) #calculated yield
 Fs.all<-((a*alfa.v.all*Fv)+(alfa.nv.all*Fnv))/(Ys.all*(1+a)) #calculated Fm
 F0.all<-((a*Fv)+Fnv)/(1+a)  #Fm correction by extrapolation to yield=1 non linear model
 linmodel_slope<-(F0.all-F_meas)/(1-Y_meas)  #slope of linear model
+F0.a_sig<-a_sig*((Fv/(a+1))-((a*Fv)+Fnv)/(a+1)^2) # uncertainty of F100% due to a value
 
-#error calculation for the above section by propagation
-#F_meas_sig<-(sum((F_meas-Fs.all)^2))/n;Y_meas_sig<-(sum((Y_meas-Ys.all)^2))/n 
+F0.all_sig<-sqrt(F0.a_sig^2 + F14C_EC_u^2)  # error propagation for F100% due to a value & F_meas
 
 plot(F_meas,Fs.all,xlim=c(0,1),ylim=c(0,1))
 points(Y_meas,Ys.all,col="blue")
 rsqr2<-(cor(c(Ys.all,Fs.all),c(Y_meas,F_meas)))^2
 
-
-###end Gary###
+#return
 F0.all
+F0.all_sig
+####################################################################################
+#end
+####################################################################################
+
 
 

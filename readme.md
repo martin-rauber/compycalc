@@ -15,58 +15,33 @@ To use the run COMPYCALC program, follow the steps written in the comment sectio
 ### Step 1: set up environment
 
 In the first section, you are asked to set the working directory, either with the command `setwd()` or by going to Session → Set Working Directory → To Source File Location if you are using [R Studio](https://rstudio.com).
-
-    #set wd-----------------------------------------------------------------------------
-
-    # 1)  set the working directory (wd) for COMPYCALC: this folder must contain the compycalc R
-    #     file and the folder /zsrc containing the scripts. The wd name will be used to name the 
-    #     result files. 
-
-    #setwd("")
-
+    
 ### Step 2: add OC/EC analyzer files
 
-In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Now please be aware that the script will take the last digit of each folder for naming, so at best name your folders with xyz-[letter] (xyz-A, xyz-B, …).
+In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Please be aware that the script will take the last digit of each folder for naming, so at best name your folders with xyz-[letter] (xyz-A, xyz-B, …).
 
 **Note:** delete all unnecessary files (including hidden files) in the folder you want to run COMPYCALC. Keep only the Sunset raw file folders as described above, the `compycalc.R` script, the *zsrc* folder containing additional scripts.
 
-    #add data---------------------------------------------------------------------------
-
-    # 2)  Sunset data
-    #     Add your folder(s) with the individual Sunset measurement(s) to the wd folder. 
-
 ### Step 3: add radiocarbon data
 
-Last but not least you have to add the F<sup>14</sup>C(EC) and F<sup>14</sup>OC raw data. These need to be in sample order and in a csv file in the working directory, i.e. the folder where your `compycalc.R` file is.
-
-    # 3)  enter F14C EC and OC raw data
-              ##EC: import from csv
-              F14C_EC_raw_data = read.csv(list.files(".",pattern = "*EC-F14C-raw-data.csv" ,  recursive = TRUE), header = TRUE)
-              F14C_EC_raw_data = F14C_EC_raw_data[,]
-              #OR enter here manually
-              #F14C_EC_raw_data = c()
-              
-              ##OC: import from csv
-              F14C_OC_raw_data = read.csv(list.files(".",pattern = "*OC-F14C-raw-data.csv" ,  recursive = TRUE), header = TRUE)
-              F14C_OC_raw_data = F14C_OC_raw_data[,]
-              #OR enter here manually
-              #F14C_OC_raw_data = c()
+Last but not least you have to add the F<sup>14</sup>C(EC) and F<sup>14</sup>OC raw data as csv files. F<sup>14</sup>C(EC) contains the measured F<sup>14</sup>C(EC) values in the first column and measurement uncertainties in the second column. The F<sup>14</sup>OC only contains the calculated values. Note that the files need to be in sample order. The csv file must be in the working directory, i.e. the folder where your `compycalc.R` file is.
 
 ### Step 4: run code
 
-Finally, you are ready to run the COMPYCALC script.
-
-    # 4)  run script
-              
-    #OUTPUT          
-    #         - each folder with measurements will get three files: "last-digit-of-folder"-mean-results.csv, "last-digit-of-folder"-raw-results.csv, "last-digit-of-folder"-stats.csv
-    #         - wd folder will get "your-wd-name-here"-mean-summary-with-F14C.csv and "your-wd-name-here"-F14C_and_EC-yield-and-charring-summary.pdf
-
-### Step 5: iteration
-
-For best results, it's recommended to run COMPYCALC at least twice to use a corrected F<sup>14</sup>OC. First you use the uncorrected F<sup>14</sup>C(EC) and calculated F<sup>14</sup>OC values (raw data) and run the script, then use the corrected F<sup>14</sup>C(EC) vaule for the calculation of the first run corrected of F<sup>14</sup>OC. Now run COMPYCALC again with the first run corrected F<sup>14</sup>C(EC) & F<sup>14</sup>OC. With the F<sup>14</sup>C(EC) result of the second run you can calculate the final F<sup>14</sup>OC: <br/> <br/> Initial F<sup>14</sup>C(EC) & F<sup>14</sup>C(OC) → **first run** of COMPYCALC → calculation of first run corrected of F<sup>14</sup>OC → **second run** of COMPYCALC → **final F**<sup>14</sup>C(EC) and calculation of **final F**<sup>14</sup>C(OC) <br/>
-
-After this iteration the differences should be minuscule and you can use the final F<sup>14</sup>C(EC) and F<sup>14</sup>C(OC) values.
+Finally, you are ready to run the COMPYCALC script. 
+    
+As an output, you will get:       
+   
+*   Each folder with Sunset measurement files will get five output files:
+	*   calc-summary-plots.pdf
+	*   clean-results.csv
+	*   mean-results.csv
+	*   raw-results.csv
+	*   stats.csv
+*   The working directory folder will get two files:
+	*   mean-summary-with-F14C.csv
+	*   F14C-and-EC-yield-and-charring-summary.pdf
+   
 
 ## How does COMPYCALC work?
 
