@@ -13,7 +13,7 @@
 
 #set wd-----------------------------------------------------------------------------
 
-# 1)  set the working directory (wd) for COMPYCALC: this folder must contain the compycalc R
+# 1)  set the working directory (wd) for COMPYCALC: this folder must contain the compycalc.R
 #     file and the folder /zsrc containing the scripts. The wd name will be used to name the 
 #     result files. Note that no other files should be in the folder, including hidden files.
 
@@ -32,7 +32,8 @@
           
           ##OC: import from csv
           F14C_OC_raw_data <- read.csv(list.files(".",pattern = "*OC-F14C-raw-data.csv" ,  recursive = FALSE), header = TRUE)
-          F14C_OC_raw_data <- F14C_OC_raw_data[,]
+          F14C_OC_u <- F14C_OC_raw_data[,2]
+          F14C_OC_raw_data <- F14C_OC_raw_data[,1]
           
 # 4)  run script
           
@@ -81,17 +82,17 @@ getwd()
 #load csv files from all subdirectories---------------------------------------------
 #raw results from each filter with outiers for (box)plots
 df_all <- list.files(".",pattern = "*raw-results.*csv",  recursive = TRUE) %>% map_df(~fread(.))
-colnames(df_all) <- c("filtercounter","EC_yield", "charring_S1", "charring_S2", "charring_S3", "filter_name")
+colnames(df_all) <- c("filtercounter","EC_yield", "charring_S1", "charring_S2", "charring_S3", "charr_u", "filter_name")
 df_all$filter_name_short <- str_sub(df_all$filter_name,(nchar(df_all$filter_name)),nchar(df_all$filter_name))
 
-df_all_charring <- df_all[,3:7]
+df_all_charring <- df_all[,c(3:5,7,8)]
 
 #clean results from each filter (w/o outliers)
 df <- list.files(".",pattern = "*clean-results.*csv",  recursive = TRUE) %>% map_df(~fread(.))
 colnames(df) <- c("filtercounter","EC_yield", "charring_S1", "charring_S2", "charring_S3", "filter_name")
 df$filter_name_short <- str_sub(df$filter_name,(nchar(df$filter_name)),nchar(df$filter_name))
 
-df_charring <- df[,3:7]
+df_charring <- df[,c(3:5,7,8)]
 
 #stats file
 df_stats = list.files(".",pattern = "*-stats.*csv",   recursive = TRUE) %>% map_df(~fread(.))
@@ -193,7 +194,6 @@ F14C_EC100_0_charr_a <- (F14C_EC100-F14C_OC_raw_data*0.5*total_charr$total_charr
 #F14C_EC100_0_charr_b: F14C charring (S1+S2+S3) corrected
 F14C_EC100_0_charr_b <- (F14C_EC_raw_data-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
 #F14C_EC100_0_charr_c: F14C with charring (both S1+S2+S3) + Slope correction (charr_corr_slope calculated in yields_calc_ext.R)
-print(df_stats_mean)
 F14C_EC100_0_charr_c <- charr_corr_slope*(1-df_stats_mean$`EC-yield`)+F14C_EC100_0_charr_b 
 #mean final correction to 0% charring
 F14C_EC100_0_charr <- cbind(F14C_EC100_0_charr_a, F14C_EC100_0_charr_c)
@@ -204,20 +204,34 @@ F14C_EC100_0_charr
 # F14C_EC_u: input, measurement uncertainty;  F14C_EC100_u: uncertainty after correction to 100% EC yield; 
 # F14C_EC100_0_charr_u uncertainty after correction to 100% EC yield and correction to 0% charring
 
+# F14C_OC_u defined in OC data import
+# charr_slope_u defined in yields_calc_ext as fitting_poly.coef_u[2]
+#import charr_u
+charr_u <- as.data.frame(df_stats_mean[,6]) 
+#yield_u approximated with charr_u
+yield_u <- charr_u
+
 # uncertainty of the F14C(EC) corrected to 100% EC yield from the corr_100_EC script
-F14C_EC100_u <- F0.all_sig
-# preliminary uncertainty estimation of the correction to 0% charring
-F14C_EC100_0_charr_a_u <- sqrt((F14C_EC100_u-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)^2/(1-0.5*total_charr$total_charr_mean)^2)
-F14C_EC100_0_charr_b_u <- sqrt((F14C_EC_u-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)^2/(1-0.5*total_charr$total_charr_mean)^2)
-F14C_EC100_0_charr_c_u <- sqrt((charr_corr_slope*(1-df_stats_mean$`EC-yield`)+F14C_EC100_0_charr_b_u)^2)
-F14C_EC100_0_charr_u <- sqrt(F0.a_sig^2 + F14C_EC_u^2 +((F14C_EC100_0_charr_a_u+F14C_EC100_0_charr_c_u)/2)^2)
+F14C_EC100_u<- F0.all_sig
+dFcharr_a_FOC<- -(0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
+dFcharr_a_FEC100 <- 1/(1-0.5*total_charr$total_charr_mean)    
+#uncertainty of the charring a relative to the uncertaintiy of the F(EC) 
+dFcharr_a_FEC_raw <- dFcharr_a_FEC100 
+dFcharr_a_tcharr <- ((0.5*(F14C_EC100-0.5*F14C_OC_raw_data*total_charr$total_charr_mean))/(1-0.5*total_charr$total_charr_mean)^2)-((0.5*F14C_OC_raw_data)/(1-0.5*total_charr$total_charr_mean))
+dFcharr_b_FEC_raw<-dFcharr_a_FEC100
+dFcharr_b_tcharr<-((0.5*(F14C_EC_raw_data-0.5*F14C_OC_raw_data*total_charr$total_charr_mean))/(1-0.5*total_charr$total_charr_mean)^2)-((0.5*F14C_OC_raw_data)/(1-0.5*total_charr$total_charr_mean))
+dFcharr_c_slope<-(1-df_stats_mean$`EC-yield`) ; dFcharr_c_yield <- -charr_corr_slope
+F14C_EC100_0_charr_a_u<-sqrt((dFcharr_a_FOC*F14C_OC_u)^2 + (dFcharr_a_FEC100*F14C_EC100_u)^2 + (dFcharr_a_tcharr*charr_u)^2)
+F14C_EC100_0_charr_b_u<-sqrt((dFcharr_a_FOC*F14C_OC_u)^2 + (dFcharr_a_FEC_raw*F14C_EC_u)^2   + (dFcharr_b_tcharr*charr_u)^2)
+F14C_EC100_0_charr_c_u<-sqrt((dFcharr_c_slope*charr_slope_u)^2 + (dFcharr_c_yield*yield_u)^2 + (F14C_EC100_0_charr_b_u^2) )
+F14C_EC100_0_charr_u<-sqrt(F14C_EC100_0_charr_a_u^2 + F14C_EC100_0_charr_b_u^2 + F14C_EC100_0_charr_c_u^2)  
 
 #linear slope calculation for extrapolation to 100% EC
 linear_slope <- (F14C_EC100-F14C_EC_raw_data)/(1-df_stats_mean[,2])
 colnames(linear_slope) <- c("linear_slope")
 
 #export result as csv
-df_stats_mean_F14C <- cbind(df_stats_mean[,6],df_stats_mean[,2:5],total_charr$total_charr_mean,as.data.frame(F14C_EC_raw_data),F14C_EC_u, F14C_EC100,F14C_EC100_u, linear_slope,F14C_EC100_0_charr,F14C_EC100_0_charr_u)
+df_stats_mean_F14C <- cbind(df_stats_mean[,7],df_stats_mean[,2:5],total_charr$total_charr_mean,as.data.frame(F14C_EC_raw_data),F14C_EC_u, F14C_EC100,F14C_EC100_u, linear_slope,F14C_EC100_0_charr,F14C_EC100_0_charr_u)
 colnames(df_stats_mean_F14C) <- c("filter_name_short","EC_yield","charring_S1", "charring_S2","charring_S3", "charring_total","F14C_EC","F14C_EC_u","F14C_EC100","F14C_EC100_u", "linear_slope","F14C_EC100_0_charr","F14C_EC100_0_charr_u")
 write.csv(df_stats_mean_F14C, file <- paste(basename(getwd()),"-mean-summary-with-F14C.csv",sep=""), row.names = F)
 
@@ -233,7 +247,7 @@ F14C_EC100_corr <- df_stats_mean_F14C[,c(1,9)]
 F14C_EC100_corr$F14C_u <- F14C_EC100_u
 F14C_EC100_corr$class <- "corr. to 100% EC-yield"
 colnames(F14C_EC100_corr) <- c("filter_name_short","F14C","F14C_u", "class") 
-F14C_EC100_corr
+
 #add values for EC-yield correction to 100% and 0% charring
 F14C_EC100_0_charr_corr <-  df_stats_mean_F14C[,c(1,12)]
 F14C_EC100_0_charr_corr$F14C_u <- F14C_EC100_0_charr_u
@@ -241,7 +255,6 @@ F14C_EC100_0_charr_corr$class <- "corr. to 100% EC-yield at 0% charring"
 colnames(F14C_EC100_0_charr_corr) <- c("filter_name_short","F14C","F14C_u", "class") 
 F14C_EC100_0_charr_corr
 all_F14C_data <- rbind(F14C_raw,F14C_EC100_corr,F14C_EC100_0_charr_corr)
-all_F14C_data
 
 #plot the corrected and uncorrected F14C value for each filter
 theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
@@ -260,7 +273,6 @@ plot_all_F14C <- ggplot(all_F14C_data, aes(x=filter_name_short, y=F14C)) +
                                                   ))
 plot_all_F14C <- plot_all_F14C + theme( plot.margin = margin(1, 0.2, 0.2, 0.2, "cm"),legend.title = element_blank(), legend.position="top")
 plot_all_F14C <- plot_all_F14C + guides(shape=guide_legend(nrow=3))
-plot_all_F14C
 
 #summary figure with F14C and EC-yiled
 fig_summary_F14C_top = ggarrange(
@@ -270,9 +282,6 @@ fig_summary_F14C_top = ggarrange(
   nrow = 1)
 fig_summary_F14C_top
 
-#Version info in pdf
-compycalc_version = "pdf generated by COMPYCALC version 1.2.x"
-
 #create a summary figure with F14C, EC-yield, and charring. Export plots as pdf 
 pdf(file =  paste(basename(getwd()),"-F14C_and_EC-yield-and-charring-summary.pdf",sep=""), width = 8.3 , height = 11.7)
 fig_summary = ggarrange(
@@ -281,7 +290,7 @@ fig_summary = ggarrange(
   ncol = 1,
   nrow = 2)
 annotate_figure(fig_summary, top = text_grob(paste("\n",basename(getwd())," summary",sep=""), color = "black" , face = "bold", size = 16),
-               bottom = text_grob(paste(compycalc_version, "   ", Sys.info()[["user"]],Sys.time(), "  ",sep=" "), color = "black",  face = "italic", size = 10),)
+               bottom = text_grob(paste("pdf generated by COMPYCALC", "   ", Sys.info()[["user"]],Sys.time(), "  ",sep=" "), color = "black",  face = "italic", size = 10),)
 dev.off()
 
 ####################################################################################

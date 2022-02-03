@@ -18,13 +18,13 @@ In the first section, you are asked to set the working directory, either with th
     
 ### Step 2: add OC/EC analyzer files
 
-In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Please be aware that the script will take the last digit of each folder for naming, so at best name your folders with xyz-[letter] (xyz-A, xyz-B, …).
+In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Please be aware that the script will take the last digit of each folder for naming, so make sure that you name your folders accordingly.
 
 **Note:** delete all unnecessary files (including hidden files) in the folder you want to run COMPYCALC. Keep only the Sunset raw file folders as described above, the `compycalc.R` script, the *zsrc* folder containing additional scripts.
 
 ### Step 3: add radiocarbon data
 
-Last but not least you have to add the F<sup>14</sup>C(EC) and F<sup>14</sup>OC raw data as csv files. F<sup>14</sup>C(EC) contains the measured F<sup>14</sup>C(EC) values in the first column and measurement uncertainties in the second column. The F<sup>14</sup>OC only contains the calculated values. Note that the files need to be in sample order. The csv file must be in the working directory, i.e. the folder where your `compycalc.R` file is.
+Last but not least you have to add the F<sup>14</sup>C(EC) and F<sup>14</sup>C(OC) raw data with uncertainties as separate csv files. F<sup>14</sup>C(EC) contains the measured F<sup>14</sup>C(EC) values in the first column and measurement uncertainties in the second column. For OC you do the same: F<sup>14</sup>C(OC) contains the calculated F<sup>14</sup>C(OC) values in the first column and uncertainties in the second column. Note that the files need to be in sample order. The csv files must be in the working directory, i.e. the folder where your `compycalc.R` file is.
 
 ### Step 4: run code
 

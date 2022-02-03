@@ -1,5 +1,7 @@
 ###################################################################################
-#yields calc io
+#yields_calc_io.R
+#creates output files for compycalc.R in each folder containing Sunset raw files 
+#after EC yield calculation by calling the yields_calc_ext.R script
 ###################################################################################
 #README
 #The following files need to be in the same folder and set to the working directory:
@@ -18,12 +20,11 @@
 
 #select the fitting type values: 
 fitting_type = "poly"                                     #poly, expo, or manual
-manual.coef = c(7645, -0.371, 5.32E-4)                    #enter manual coefficients if fitting_type manual is selected
 
 #enter a filename for the export files
 result_filename = basename(getwd())  
 
-#set value for outlier removal (1.5*IQR recomended)
+#set value for outlier removal (1.5*IQR recommended)
 IQR <- 1.5
 
 ####################################################################################
@@ -31,7 +32,7 @@ IQR <- 1.5
 ####################################################################################
 
 #clean up environment---------------------------------------------------------------
-rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scripts", "home_wd","F14C_EC_raw_data","F14C_OC_raw_data","F14C_EC_u","charr_corr_slope","IQR" )))
+rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scripts", "home_wd","F14C_EC_raw_data","F14C_OC_raw_data","F14C_EC_u","F14C_OC_u","charr_corr_slope","charr_slope_u","IQR" )))
 if(!is.null(dev.list())) dev.off()
 #load function----------------------------------------------------------------------
 data_load_func = function(filename) {
@@ -52,11 +53,9 @@ filename <- dir(".",pattern="^(.*)txt$")
 df_raw <- NULL
 for (i in filename){
   data_load_func(i)
-  df_raw <- rbind(df_raw, data.frame(tabla_resultados2$EC_yield_S3,tabla_resultados2$charring_S1,tabla_resultados2$charring_S2,tabla_resultados2$charring_S3))}
-
-#rm(list=setdiff(ls(), c("df","result_filename", "csv_raw", "csv_stat", "csv_mean")))
+  df_raw <- rbind(df_raw, data.frame(tabla_resultados2$EC_yield_S3,tabla_resultados2$charring_S1,tabla_resultados2$charring_S2,tabla_resultados2$charring_S3,tabla_resultados2$charr_u))}
 df_raw$filter <- c(rep(result_filename, length(df_raw$tabla_resultados2.EC_yield)))
-colnames(df_raw) <- c("EC_yield", "charring_S1", "charring_S2", "charring_S3", "filter_name")
+colnames(df_raw) <- c("EC_yield", "charring_S1", "charring_S2", "charring_S3", "charr_u","filter_name")
 
 #extract specific data--------------------------------------------------------------
 df_length_raw <- length(df_raw$EC_yield)
@@ -71,7 +70,7 @@ plot_yield_raw <- ggboxplot(width=0.33, data=df_yield_raw, x = "dummy", y = "EC.
 #plot: charring for each Sunset step (raw data)
 plot_charr_raw <- ggboxplot(data=df_charr_raw, x="Sunset.step", y="charring.value", xlab="Sunset step", ylab = "charring")+
   geom_hline(yintercept = 0, color="red", lty= 5)
-
+#arrange plots
 fig_EC_yield_charring_raw <- ggarrange(plot_yield_raw, plot_charr_raw, ncol = 2, nrow = 1)
 fig_EC_yield_charring_raw <- fig_EC_yield_charring_raw + theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
 fig_EC_yield_charring_raw <- annotate_figure(fig_EC_yield_charring_raw, top = text_grob("Raw data", color = "darkred", face = "bold", size = 12))
@@ -94,7 +93,9 @@ df_yield <- data.frame("EC-yield" = df$EC_yield, "dummy"= rep("",df_length), str
 #calculate stats and generate plots-------------------------------------------------
 
 #general stats
-stat <- stat.desc(df[, -5])
+stat <- stat.desc(df[, -6])
+stat$filter_name <- c(result_filename)
+colnames(stat) <- c("EC-yield", "charring S1", "charring S2", "charring S3", "charr_u", "filter name")
 #mean of each EC-yield and each Sunset step
 df_mean <- stat[9,]
 
@@ -114,8 +115,8 @@ fig_EC_yield_charring_wo_outliers <- fig_EC_yield_charring_wo_outliers + theme(p
 fig_EC_yield_charring_wo_outliers <- annotate_figure(fig_EC_yield_charring_wo_outliers, top = text_grob("Outliers removed", color = "darkblue", face = "bold", size = 12))
 
 #stats table
-colnames(stat) <- c("EC-yield", "charring S1", "charring S2", "charring S3")
-stat_table <- ggtexttable(format(stat[c(9,4:6,8,12,13),], digits = 3),  theme = ttheme("blank"))
+colnames(stat) <- c("EC-yield", "charring S1", "charring S2", "charring S3", "charring uncertainty")
+stat_table <- ggtexttable(format(stat[c(9,4:6,8,12,13),c(1:5)], digits = 3),  theme = ttheme("blank"))
 
 #generate summary pdfs---------------------------------------------------------------
 
@@ -155,24 +156,10 @@ file.remove(file.list.rem)
 
   write.csv(df_raw, file =  paste(result_filename,"-raw-results.csv",sep=""), row.names = T)
   write.csv(df, file =  paste(result_filename,"-clean-results.csv",sep=""), row.names = T)
-  write.csv(stat, file =  paste(result_filename,"-stats.csv",sep=""), row.names = T)
+  write.csv(stat[,-6], file =  paste(result_filename,"-stats.csv",sep=""), row.names = T)
   write.csv(df_mean, file =  paste(result_filename,"-mean-results.csv",sep=""), row.names = T)
 
 #end--------------------------------------------------------------------------------
-
-####################################################################################
-#changelog
-
-#V1.0.6   Outlier removal IQR >1.5, output plots aaa1 and aaa2 pdf for: qqplots etc. 
-#V1.0.5   minor changes
-#V1.0.4   generate pdf summary of the main yields_calc_ext pots
-#V1.0.3   keep plots from yields_calc_ext.R
-#V1.0.2   corrections from Gary 02.04.2020
-#V1.0.1   automatic script to load libraries and install package if necessary 
-#V1.0.0   code based on dev. version mr20200330a
-
-
-####################################################################################
 
 
 
