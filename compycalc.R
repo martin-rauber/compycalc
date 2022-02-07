@@ -123,7 +123,7 @@ theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
 plot_EC_yield = ggplot(df_all, aes(x=filter_name_short, y=EC_yield)) + 
   geom_boxplot(colour = "#424242", outlier.colour="red", outlier.shape=8, outlier.size=2)+
   xlab("filter")+
-  ylab("EC-yield")
+  ylab("EC yield")
 plot_EC_yield = plot_EC_yield + theme( plot.margin = margin(1, 0.2, 0.2, 0.2, "cm"))
 plot_EC_yield
 
