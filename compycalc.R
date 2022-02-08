@@ -122,7 +122,7 @@ ggtexttable(format(n_filter_data),  theme = ttheme("blank"))
 theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
 plot_EC_yield = ggplot(df_all, aes(x=filter_name_short, y=EC_yield)) + 
   geom_boxplot(colour = "#424242", outlier.colour="red", outlier.shape=8, outlier.size=2)+
-  xlab("filter")+
+  xlab("Filter")+
   ylab("EC yield")
 plot_EC_yield = plot_EC_yield + theme( plot.margin = margin(1, 0.2, 0.2, 0.2, "cm"))
 plot_EC_yield
@@ -154,7 +154,7 @@ plot_charring_S2
 theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
 plot_charring_S3 = ggplot(df_all_charring, aes(x=filter_name_short, y=charring_S3)) + 
   geom_boxplot(colour = "#424242", outlier.colour="red", outlier.shape=8, outlier.size=2)+
-  xlab("filter")+
+  xlab("Filter")+
   ylab("")+
   geom_hline(yintercept = 0, color="red", lty= 5)+
   coord_cartesian(ylim = c(-0.05, 0.14))
@@ -168,7 +168,7 @@ fig_summary_charring = ggarrange(
   labels = c("S1", "S2", "S3"), 
   align = "hv" ,ncol = 1, 
   nrow = 3)
-fig_summary_charring = annotate_figure(fig_summary_charring,left = text_grob("charring", color = "black", size = 14, rot = 90))
+fig_summary_charring = annotate_figure(fig_summary_charring,left = text_grob("Fraction of charring", color = "black", size = 14, rot = 90))
 fig_summary_charring
 
 ####################################################################################
@@ -261,7 +261,7 @@ theme_set(theme_classic(base_size = 13,base_family = "Helvetica"))
 plot_all_F14C <- ggplot(all_F14C_data, aes(x=filter_name_short, y=F14C)) +
   geom_point(aes(shape= factor(class, levels = c("uncorrected","corr. to 100% EC-yield","corr. to 100% EC-yield at 0% charring")), color = factor(class, levels = c("uncorrected","corr. to 100% EC-yield","corr. to 100% EC-yield at 0% charring"))))+
   geom_errorbar(mapping=aes(x=filter_name_short, ymin=F14C-F14C_u, ymax=F14C+F14C_u), width=0.15, size=0.2, color="black") +
-  xlab("filter")+
+  xlab("Filter")+
   ylab(bquote(~ F^14~C))+
   scale_y_continuous(expand = c(0, 0), limits = c(0,
                                                   if ( max(all_F14C_data$F14C) > 1) {
