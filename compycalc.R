@@ -48,26 +48,25 @@
 # preparation
 ####################################################################################
 #load libraries & install packages if necessary-------------------------------------
-load.lib = c("ggpubr", "dplyr", "data.table", "purrr", "stringr", "pastecs","readxl","MASS", "ggplot2", "pracma", "signal","gridGraphics", "pdftools", "outliers")   
-install.lib = load.lib[!load.lib %in% installed.packages()]
+load.lib <- c("ggpubr", "dplyr", "data.table", "purrr", "stringr", "pastecs","readxl","MASS", "ggplot2", "pracma", "signal","gridGraphics", "pdftools", "outliers")   
+install.lib <- load.lib[!load.lib %in% installed.packages()]
 for(lib in install.lib) install.packages(lib,dependencies=TRUE)
 sapply(load.lib,require,character=TRUE)
 #clean up environment---------------------------------------------------------------
 if(!is.null(dev.list())) dev.off()
 #save home wd-----------------------------------------------------------------------
-home_wd = getwd()
+home_wd <- getwd()
 
 ####################################################################################
 # yield calc.
 ####################################################################################
 
 #run yield calc for each subfolder--------------------------------------------------
-parent_folder = getwd()
-sub_folders = list.dirs(parent_folder, recursive=TRUE)[-1]
+parent_folder <- getwd()
+sub_folders <- list.dirs(parent_folder, recursive=TRUE)[-1]
 r_scripts <- file.path(parent_folder, "zsrc/yields_calc_io.R")
-#omit the hidden .git and .Rproj files
-sub_folders <- sub_folders[!str_detect(sub_folders,".git")]
-sub_folders <- sub_folders[!str_detect(sub_folders,".Rproj")]
+#omit files and the hidden .git and .Rproj files
+sub_folders <- sub_folders[!str_detect(sub_folders, paste(c(".git",".Rproj"), collapse = "|"))]
 # Run scripts in sub-folders 
 for(j in sub_folders) {
   setwd(j)
@@ -98,7 +97,7 @@ df$filter_name_short <- str_sub(df$filter_name,(nchar(df$filter_name)),nchar(df$
 df_charring <- df[,c(3:5,7,8)]
 
 #stats file
-df_stats = list.files(".",pattern = "*-stats.*csv",   recursive = TRUE) %>% map_df(~fread(.))
+df_stats <- list.files(".",pattern = "*-stats.*csv",   recursive = TRUE) %>% map_df(~fread(.))
 df_stats$filter_name_short <- c(rep(unique(df$filter_name_short),each = 14))
 df_stats
 # number of filters for each sample
