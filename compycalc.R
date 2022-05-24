@@ -65,6 +65,9 @@ home_wd = getwd()
 parent_folder = getwd()
 sub_folders = list.dirs(parent_folder, recursive=TRUE)[-1]
 r_scripts <- file.path(parent_folder, "zsrc/yields_calc_io.R")
+#omit the hidden .git and .Rproj files
+sub_folders <- sub_folders[!str_detect(sub_folders,".git")]
+sub_folders <- sub_folders[!str_detect(sub_folders,".Rproj")]
 # Run scripts in sub-folders 
 for(j in sub_folders) {
   setwd(j)
