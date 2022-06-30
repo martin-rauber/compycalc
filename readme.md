@@ -20,7 +20,9 @@ In the first section, you are asked to set the working directory, either with th
 
 In the second step, you are ask to add your Sunset raw files in folders to the working directory folder. Obviously, you can also do it the other way around by adding the `compycalc.R` script to the folder where your data is. Please be aware that the script will take the last digit of each folder for naming, so make sure that you name your folders accordingly.
 
-**Note:** delete all unnecessary files (including hidden files) in the folder you want to run COMPYCALC. Keep only the Sunset raw file folders as described above, the `compycalc.R` script, the *zsrc* folder containing additional scripts.
+**OPTION**: add a EC, TC or Swiss_4S run raw data file recorded with the same Sunset OC/EC analyzer oven conditions than your samples. Add the file into the *zsrc* folder and rename it to `custom_cooldown.csv`. This is to correct for the opacity of the Sunset OC/EC analyzer to accurately calcualte the EC yield. This option is **highly recommended**. Otherwise, the default `custom_cooldown.csv` file will be used, which is a generic cooldown file reflecting a new analyzer oven. 
+
+**Note:** delete all unnecessary files (including hidden files) in the folder you want to run COMPYCALC. Keep only the Sunset raw file folders as described above, the `compycalc.R` script, the *zsrc* folder containing additional scripts and the cooldown data. 
 
 ### Step 3: add radiocarbon data
 

@@ -36,7 +36,13 @@ rm(list=setdiff(ls(), c("result_filename","fitting_type","manual.coef", "r_scrip
 if(!is.null(dev.list())) dev.off()
 #load function----------------------------------------------------------------------
 data_load_func = function(filename) {
-  cooldown = read.csv("../zsrc/cooldown_data.csv", sep = ",", header = T)
+  if (file.exists("../zsrc/custom_cooldown.csv")==T) {
+    cooldown <- read.csv("../zsrc/custom_cooldown.csv", sep = ",", skip = 28, header = T)
+    cooldown <- cooldown[,c(1:18)]
+    cooldown <- tail(cooldown,340)
+  } else {
+    cooldown = read.csv("../zsrc/cooldown_data.csv", sep = ",", header = T)
+  }
   dat = as.data.frame(read.csv(file = filename, sep = ",", skip = 28, header = T ))[,c(1:18)]
   tabla_complete <<- rbind(dat, cooldown)
   yield_calc = function(tabla_complete, fitting_type, manual.coef) {source("../zsrc/yields_calc_ext.R")}
