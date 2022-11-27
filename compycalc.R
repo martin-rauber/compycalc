@@ -191,10 +191,12 @@ F14C_EC100 <- F0.all
 df_charring$charring_total <- df_charring$charring_S1+df_charring$charring_S2+df_charring$charring_S3
 total_charr <- aggregate(x = df_charring$charring_total, by = list(df_charring$filter_name_short), FUN = mean) 
 colnames(total_charr) <- c("filter_name_short","total_charr_mean")
+#PCFactor. The factor is used to correct for both the losses of pyrolytic carbon (PC) during the thermal treatment and the effect of the different MAC values of PC and EC
+PCFactor <- 0.2
 #F14C_EC100_0_charr_a: F14C (100% EC yield) with charring (S1+S2+S3) subtraction
-F14C_EC100_0_charr_a <- (F14C_EC100-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
+F14C_EC100_0_charr_a <- (F14C_EC100-F14C_OC_raw_data*PCFactor*total_charr$total_charr_mean)/(1-PCFactor*total_charr$total_charr_mean)
 #F14C_EC100_0_charr_b: F14C charring (S1+S2+S3) corrected
-F14C_EC100_0_charr_b <- (F14C_EC_raw_data-F14C_OC_raw_data*0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
+F14C_EC100_0_charr_b <- (F14C_EC_raw_data-F14C_OC_raw_data*PCFactor*total_charr$total_charr_mean)/(1-PCFactor*total_charr$total_charr_mean)
 #F14C_EC100_0_charr_c: F14C with charring (both S1+S2+S3) + Slope correction (charr_corr_slope calculated in yields_calc_ext.R)
 F14C_EC100_0_charr_c <- charr_corr_slope*(1-df_stats_mean$`EC-yield`)+F14C_EC100_0_charr_b 
 #mean final correction to 0% charring
@@ -215,13 +217,13 @@ yield_u <- charr_u
 
 # uncertainty of the F14C(EC) corrected to 100% EC yield from the corr_100_EC script
 F14C_EC100_u<- F0.all_sig
-dFcharr_a_FOC<- -(0.5*total_charr$total_charr_mean)/(1-0.5*total_charr$total_charr_mean)
-dFcharr_a_FEC100 <- 1/(1-0.5*total_charr$total_charr_mean)    
+dFcharr_a_FOC<- -(PCFactor*total_charr$total_charr_mean)/(1-PCFactor*total_charr$total_charr_mean)
+dFcharr_a_FEC100 <- 1/(1-PCFactor*total_charr$total_charr_mean)    
 #uncertainty of the charring a relative to the uncertaintiy of the F(EC) 
 dFcharr_a_FEC_raw <- dFcharr_a_FEC100 
-dFcharr_a_tcharr <- ((0.5*(F14C_EC100-0.5*F14C_OC_raw_data*total_charr$total_charr_mean))/(1-0.5*total_charr$total_charr_mean)^2)-((0.5*F14C_OC_raw_data)/(1-0.5*total_charr$total_charr_mean))
+dFcharr_a_tcharr <- ((PCFactor*(F14C_EC100-F14C_OC_raw_data*PCFactor*total_charr$total_charr_mean))/(1-PCFactor*total_charr$total_charr_mean)^2)-((PCFactor*F14C_OC_raw_data)/(1-PCFactor*total_charr$total_charr_mean))
 dFcharr_b_FEC_raw<-dFcharr_a_FEC100
-dFcharr_b_tcharr<-((0.5*(F14C_EC_raw_data-0.5*F14C_OC_raw_data*total_charr$total_charr_mean))/(1-0.5*total_charr$total_charr_mean)^2)-((0.5*F14C_OC_raw_data)/(1-0.5*total_charr$total_charr_mean))
+dFcharr_b_tcharr<-((PCFactor*(F14C_EC_raw_data-F14C_OC_raw_data*PCFactor*total_charr$total_charr_mean))/(1-PCFactor*total_charr$total_charr_mean)^2)-((PCFactor*F14C_OC_raw_data)/(1-PCFactor*total_charr$total_charr_mean))
 dFcharr_c_slope<-(1-df_stats_mean$`EC-yield`) ; dFcharr_c_yield <- -charr_corr_slope
 F14C_EC100_0_charr_a_u<-sqrt((dFcharr_a_FOC*F14C_OC_u)^2 + (dFcharr_a_FEC100*F14C_EC100_u)^2 + (dFcharr_a_tcharr*charr_u)^2)
 F14C_EC100_0_charr_b_u<-sqrt((dFcharr_a_FOC*F14C_OC_u)^2 + (dFcharr_a_FEC_raw*F14C_EC_u)^2   + (dFcharr_b_tcharr*charr_u)^2)
