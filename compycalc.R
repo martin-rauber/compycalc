@@ -91,7 +91,7 @@ df_all_charring <- df_all[,c(3:5,7,8)]
 
 #clean results from each filter (w/o outliers)
 df <- list.files(".",pattern = "*clean-results.*csv",  recursive = TRUE) %>% map_df(~fread(.))
-colnames(df) <- c("filtercounter","EC_yield", "charring_S1", "charring_S2", "charring_S3", "filter_name")
+colnames(df) <- c("filtercounter","EC_yield", "charring_S1", "charring_S2", "charring_S3", "charr_u", "filter_name")
 df$filter_name_short <- str_sub(df$filter_name,(nchar(df$filter_name)),nchar(df$filter_name))
 
 df_charring <- df[,c(3:5,7,8)]
